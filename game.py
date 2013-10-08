@@ -1,9 +1,11 @@
 import core
 import pyglet
+import pyglet.clock
 from pyglet.window import key
 from core import GameElement
 import sys
 import random
+import time
 
 #### DO NOT TOUCH ####
 GAME_BOARD = None
@@ -94,19 +96,28 @@ class Closed_Chest(GameElement):
         # If no key in the inventory, won't open the chest.
         if not player.inventory:
             GAME_BOARD.draw_msg("You need a key to open this.")
+        key_found = False
         for item in player.inventory:
-            if item.IMAGE != "Key":
-                GAME_BOARD.draw_msg("You need a key to open this.")
-            else:
-                # If there's a key object in the inventory, removes closed chest
-                # and sets an open chest object in place
-                # also removes key object from inventory
-                GAME_BOARD.del_el(self.x, self.y)
-                open_chest = Open_Chest()
-                GAME_BOARD.register(open_chest)
-                GAME_BOARD.set_el(self.x, self.y, open_chest)
-                GAME_BOARD.draw_msg("Congratulations! You opened the chest!")
-                create_new_level()
+            if item.IMAGE == "Key":
+                key_found = True
+
+                break
+        if not key_found:
+            GAME_BOARD.draw_msg("You need a key to open this.")
+        else:
+            # If there's a key object in the inventory, removes closed chest
+            # and sets an open chest object in place
+            GAME_BOARD.del_el(self.x, self.y)
+            open_chest = Open_Chest()
+            GAME_BOARD.register(open_chest)
+            GAME_BOARD.set_el(self.x, self.y, open_chest)
+            GAME_BOARD.draw_msg("Congratulations! You opened the chest!")
+            # pyglet.clock._ClockBase.sleep(pyglet.clock._ClockBase, 3000000)
+            go_to_new_level()
+
+            #print pyglet.clock.time
+            #pyglet.clock.schedule_once(go_to_new_level(), 3)
+            
 
 class Key(GameElement):
     IMAGE = "Key"
@@ -115,6 +126,7 @@ class Key(GameElement):
     def interact(self, player):
         player.inventory.append(self)
         GAME_BOARD.draw_msg("You just acquired a key! You have %d items!" %(len(player.inventory)))
+
 
 class Bug(GameElement):
     IMAGE = "Bug"
@@ -157,7 +169,10 @@ class Closed_Door(GameElement):
             GAME_BOARD.register(open_door)
             GAME_BOARD.set_el(self.x, self.y, open_door)
             GAME_BOARD.draw_msg("Congratulations! You opened the door!")
-            create_new_level()
+            # print pyglet.clock.time
+            # pyglet.clock.schedule_once(go_to_new_level(), 3)
+            go_to_new_level()
+            
 
 class Open_Door(GameElement):
     IMAGE = "DoorOpen"
@@ -185,6 +200,13 @@ def keyboard_handler():
         direction = "right"
     elif KEYBOARD[key.SPACE]:
         GAME_BOARD.erase_msg()
+    elif KEYBOARD[key.ENTER]:
+        create_new_level()
+    elif KEYBOARD[key.DELETE]:
+        global READY_FOR_NEXT_LEVEL
+        if READY_FOR_NEXT_LEVEL:
+            READY_FOR_NEXT_LEVEL = False
+        create_new_level()
 
     if direction:
         next_location = PLAYER.next_pos(direction)
@@ -251,6 +273,9 @@ def initialize():
     global CURRENT_LEVEL 
     CURRENT_LEVEL = 1
 
+    global READY_FOR_NEXT_LEVEL 
+    READY_FOR_NEXT_LEVEL = False
+
     global PLAYER
     PLAYER = Character()
     GAME_BOARD.register(PLAYER)
@@ -266,28 +291,54 @@ def initialize():
     make_princess(1,3)
     make_rocks(4)
 
+def go_to_new_level():
+    print "go to new level"
+    global READY_FOR_NEXT_LEVEL
+    READY_FOR_NEXT_LEVEL = True
+    GAME_BOARD.draw_msg("Do you want to advance to the next level? Press ENTER for yes, DELETE for no.")
 
-def create_new_level():
-    # this will have code to create the next level
-
-    global CURRENT_LEVEL 
-    CURRENT_LEVEL += 1
-    print "level %d"%CURRENT_LEVEL
-
+def delete_board():
     for x in range(GAME_WIDTH):
         for y in range(GAME_HEIGHT):
             element = GAME_BOARD.get_el(x, y)
             if element:
                 GAME_BOARD.del_el(x, y)
 
+def create_new_level():
 
-    # deal w where keys etc are located
-    if CURRENT_LEVEL == 2:
-        GAME_BOARD.set_el(2,2,PLAYER)
-        PLAYER.inventory = []
-        make_gem(4,2)
-        make_gem(1,3)
-        make_gem(5,1)
-        make_gem(3,5)
-        make_closed_door(4,4)
-        make_rocks(6)
+    global READY_FOR_NEXT_LEVEL
+
+    if READY_FOR_NEXT_LEVEL:
+
+        READY_FOR_NEXT_LEVEL = False
+
+        global CURRENT_LEVEL 
+        CURRENT_LEVEL += 1
+
+        GAME_BOARD.draw_msg("level %d"%CURRENT_LEVEL)
+        delete_board()
+
+        if CURRENT_LEVEL == 2:
+            GAME_BOARD.set_el(2,2,PLAYER)
+            PLAYER.inventory = []
+            make_gem(4,2)
+            make_gem(1,3)
+            make_gem(5,1)
+            make_gem(3,5)
+            make_closed_door(4,4)
+            make_rocks(6)
+        elif CURRENT_LEVEL == 3:
+            pass
+        else:
+            GAME_BOARD.draw_msg("You completed all 3 levels. You win! Congratulations!")
+            delete_board()
+            # set non-player character at the end
+    else:
+        GAME_BOARD.draw_msg("You completed this level. Thanks for playing! Start again on level 1.")
+        delete_board()
+        make_key(5,5)
+        make_gem(3,1)
+        make_bug(2,4)
+        make_closed_chest(4,3)
+        make_princess(1,3)
+        make_rocks(4)
