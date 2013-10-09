@@ -295,9 +295,17 @@ def make_heart(x,y):
     heart = Heart()
     make_anything(x,y,heart)
 
-def make_soft_rock(x,y):
-    soft_rock = Soft_Rock()
-    make_anything(x,y, soft_rock)
+def make_soft_rock(number_of_rocks):
+    rocks_made = 0
+    while rocks_made < number_of_rocks:
+        x = random.randint(1, GAME_WIDTH-2)
+        y = random.randint(1, GAME_HEIGHT-2)
+        existing_el = GAME_BOARD.get_el(x, y)
+        if not existing_el:
+            soft_rock = Soft_Rock()
+            make_anything(x,y, soft_rock)
+            rocks_made += 1
+    
 
 def make_bug(x,y):
     bug = Bug()
@@ -402,11 +410,11 @@ def create_new_level():
                 PLAYER.inventory = []
                 make_heart(2,4)
                 make_heart(4,4)
-                make_soft_rock(3,3)
                 make_gem(3,4)
                 make_gem(1,2)
                 make_green_gem(4,2)
                 make_horn_girl(5,3)
-                make_rocks(7)            
+                make_soft_rock(1)
+                make_rocks(5)            
         else: 
             GAME_BOARD.draw_msg("Thanks for playing. Goodbye!")
