@@ -264,8 +264,7 @@ def make_rocks(number_of_rocks):
         existing_el = GAME_BOARD.get_el(x, y)
         if not existing_el:
             rock = Rock()
-            GAME_BOARD.register(rock)
-            GAME_BOARD.set_el(x, y, rock)
+            make_anything(x, y, rock)
             rocks_made += 1
 
 def make_anything(x, y, el):
@@ -274,23 +273,19 @@ def make_anything(x, y, el):
 
 def make_key(x,y):
     key = Key()
-    GAME_BOARD.register(key)
-    GAME_BOARD.set_el(x, y, key)
+    make_anything(x, y, key)
 
 def make_green_gem(x,y):
     gem = Green_Gem()
-    GAME_BOARD.register(gem)
-    GAME_BOARD.set_el(x,y,gem)
+    make_anything(x,y,gem)
 
 def make_gem(x,y):
     gem = Gem()
-    GAME_BOARD.register(gem)
-    GAME_BOARD.set_el(x,y,gem)
+    make_anything(x,y,gem)
 
 def make_closed_chest(x,y):
     closed_chest = Closed_Chest()
-    GAME_BOARD.register(closed_chest)
-    GAME_BOARD.set_el(x,y, closed_chest)
+    make_anything(x,y, closed_chest)
 
 def make_horn_girl(x,y):
     horn_girl = Horn_Girl()
@@ -306,18 +301,15 @@ def make_soft_rock(x,y):
 
 def make_bug(x,y):
     bug = Bug()
-    GAME_BOARD.register(bug)
-    GAME_BOARD.set_el(x,y, bug)
+    make_anything(x,y, bug)
 
 def make_princess(x,y):
     npc = Princess()
-    GAME_BOARD.register(npc)
-    GAME_BOARD.set_el(x,y,npc)
+    make_anything(x,y,npc)
 
 def make_boy(x,y):
     npc = Boy()
-    GAME_BOARD.register(npc)
-    GAME_BOARD.set_el(x,y,npc)
+    make_anything(x,y,npc)
 
 def make_closed_door(x,y):
     closed_door = Closed_Door()
@@ -410,11 +402,11 @@ def create_new_level():
                 PLAYER.inventory = []
                 make_heart(2,4)
                 make_heart(4,4)
-                make_soft_rock(5,3)
+                make_soft_rock(3,3)
                 make_gem(3,4)
                 make_gem(1,2)
                 make_green_gem(4,2)
-                make_horn_girl(3,3)
-                make_rocks(5)            
+                make_horn_girl(5,3)
+                make_rocks(7)            
         else: 
             GAME_BOARD.draw_msg("Thanks for playing. Goodbye!")
