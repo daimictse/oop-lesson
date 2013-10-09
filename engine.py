@@ -208,7 +208,6 @@ def run():
 
     # Set up an fps display
     try:
-	game.DEBUG = True
         if game.DEBUG == True:
             fps_display = pyglet.clock.ClockDisplay()
             draw_list.append(fps_display)
